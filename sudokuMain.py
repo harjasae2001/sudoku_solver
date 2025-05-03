@@ -1,4 +1,5 @@
 import numpy as np
+import psycopg2
 
 print('Setting Up')
 import os
@@ -6,7 +7,44 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from utils import *
 import sudokuSolver
 
-pathImage = "Resources/1.jpeg"
+def read_image_from_db():
+    try:
+        # Connect to the PostgreSQL database
+        connection = psycopg2.connect(
+            # host="your_host",
+            database="imageDB",
+            user="postgres",
+            password="Best!@#4"
+        )
+        cursor = connection.cursor()
+
+        # Query to fetch the image data
+        query = "SELECT pic_byte FROM image_table WHERE id = %s"
+        cursor.execute(query, (1,))  # Replace '1' with the appropriate ID or condition
+
+        # Fetch the image data
+        image_data = cursor.fetchone()[0]
+
+        # Save the image to a file
+        with open("Resources/1.jpg", "wb") as file:  # Change the file extension as needed
+            file.write(image_data)
+
+        print("Image has been saved as '1.jpg'.")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # Close the database connection
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+# Call the function
+read_image_from_db()
+
+pathImage = "Resources/1.jpg"
 heightImg = 450
 widthImg = 450
 model = initializePredictionModel()
